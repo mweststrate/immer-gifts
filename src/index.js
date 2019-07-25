@@ -1,73 +1,67 @@
-import React, { useState, useRef } from "react"
+import React, { useReducer } from "react"
 import ReactDOM from "react-dom"
 import "./index.css"
-import { initialState, calculateWinner, reducerWithPatches } from "./game"
-import { applyPatches } from "immer"
-import { useSocket } from "./utils"
+import { initialState, reducer } from "./gifts"
 
-const Square = ({ value, onClick }) => (
-  <button className="square" onClick={onClick}>
-    {value}
-  </button>
-)
-
-function Game() {
-  const send = useSocket("ws://localhost:5001", data => {
-    dispatch(data, false)
-  })
-  const [state, setState] = useState(initialState)
-  const undoState = useRef([])
-
-  const dispatch = (action, submitPatches = true) => {
-    setState(state => {
-      const [nextState, patches, inversePatches] = reducerWithPatches(state, action)
-      if (submitPatches) {
-        undoState.current.push(inversePatches)
-        send({ type: "patches", patches })
-      }
-      return nextState
-    })
-  }
-
-  const handleClick = i => {
+const Gift = React.memo(({ gift, users, currentUser, dispatch }) => {
+  const handleReserveClick = () => {
     dispatch({
-      type: "place",
-      square: i
+      type: "TOGGLE_RESERVE",
+      id: gift.id
     })
   }
+  return (
+    <div className={`gift ${gift.reservedBy ? "reserved" : ""}`}>
+      <img src={gift.image} alt="gift" />
+      <div className="description">
+        <h2>{gift.description}</h2>
+      </div>
+      <div className="reservation">
+        {!gift.reservedBy || gift.reservedBy === currentUser.id ? (
+          <button onClick={handleReserveClick}>{gift.reservedBy ? "Unreserve" : "Reserve"}</button>
+        ) : (
+          <span>{users[gift.reservedBy].name}</span>
+        )}
+      </div>
+    </div>
+  )
+})
+
+function GiftList() {
+  const [state, dispatch] = useReducer(reducer, initialState)
+  const { users, gifts, currentUser } = state
+  // console.dir(state)
 
   const handleReset = () => {
-    undoState.current = []
-    dispatch({ type: "reset" })
+    dispatch({ type: "RESET" })
   }
 
-  const undoLastMove = () => {
-    const patches = undoState.current.pop()
-    if (patches) {
-      setState(applyPatches(state, patches))
-      send({ type: "patches", patches })
-    }
+  const handleAdd = () => {
+    const gift = prompt("Gift to add")
+    if (gift)
+      dispatch({
+        type: "ADD_GIFT",
+        gift,
+        image: "https://picsum.photos/200?q=" + Math.random()
+      })
   }
-
-  const winner = calculateWinner(state.squares)
-
-  let status = winner ? "Winner: " + winner : "Next player: " + (state.xIsNext ? "X" : "O")
 
   return (
-    <div className="game">
-      <div className="board">
-        {state.squares.map((value, index) => (
-          <Square key={index} value={value} onClick={() => handleClick(index)} />
-        ))}
+    <div className="app">
+      <div className="header">
+        <h1>Hi, {currentUser.name}</h1>
       </div>
-      <div className="status">
-        <h1>Player {state.player}</h1>
-        {status}
-        <button onClick={undoLastMove}>Undo</button>
-        <button onClick={handleReset}>Restart</button>
+      <div className="actions">
+        <button onClick={handleAdd}>Add</button>
+        <button onClick={handleReset}>Reset</button>
+      </div>
+      <div className="gifts">
+        {gifts.map(gift => (
+          <Gift key={gift.id} gift={gift} users={users} currentUser={currentUser} dispatch={dispatch} />
+        ))}
       </div>
     </div>
   )
 }
 
-ReactDOM.render(<Game />, document.getElementById("root"))
+ReactDOM.render(<GiftList />, document.getElementById("root"))
