@@ -1,7 +1,7 @@
-import React, { useReducer, useCallback } from "react"
+import React, { useState, useCallback } from "react"
 import ReactDOM from "react-dom"
 import "./index.css"
-import { initialState, reducer } from "./gifts"
+import { initialState, reset, toggleReservation, addGift } from "./gifts"
 
 const Gift = React.memo(({ gift, users, currentUser, onReserve }) => (
   <div className={`gift ${gift.reservedBy ? "reserved" : ""}`}>
@@ -20,29 +20,20 @@ const Gift = React.memo(({ gift, users, currentUser, onReserve }) => (
 ))
 
 function GiftList() {
-  const [state, dispatch] = useReducer(reducer, initialState)
+  const [state, setState] = useState(initialState)
   const { users, gifts, currentUser } = state
-  // console.dir(state)
 
   const handleReset = () => {
-    dispatch({ type: "RESET" })
+    setState(state => initialState)
   }
 
   const handleAdd = () => {
     const gift = prompt("Gift to add")
-    if (gift)
-      dispatch({
-        type: "ADD_GIFT",
-        gift,
-        image: "https://picsum.photos/200?q=" + Math.random()
-      })
+    if (gift) setState(state => addGift(state, gift, "https://picsum.photos/200?q=" + Math.random()))
   }
 
   const handleReserve = useCallback(id => {
-    dispatch({
-      type: "TOGGLE_RESERVE",
-      id
-    })
+    setState(state => toggleReservation(state, id))
   }, [])
 
   return (

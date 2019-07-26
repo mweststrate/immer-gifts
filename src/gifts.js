@@ -1,5 +1,4 @@
 /* eslint-disable default-case */
-import produce, { applyPatches } from "immer"
 import { allUsers, getCurrentUser } from "./users"
 
 export const initialState = {
@@ -27,30 +26,35 @@ export const initialState = {
   ]
 }
 
-export const reducer = produce((draft, action) => {
-  switch (action.type) {
-    case "RESET":
-      return initialState
-    case "TOGGLE_RESERVE":
-      const gift = draft.gifts.find(gift => gift.id === action.id)
-      if (gift) {
-        switch (gift.reservedBy) {
-          case undefined:
-            gift.reservedBy = draft.currentUser.id
-            break
-          case draft.currentUser.id:
-            gift.reservedBy = undefined
-            break
-        }
+export function toggleReservation(state, id) {
+  return {
+    ...state,
+    gifts: state.gifts.map(gift => {
+      if (gift.id !== id) return gift
+      return {
+        ...gift,
+        reservedBy:
+          gift.reservedBy === undefined
+            ? state.currentUser.id
+            : gift.reservedBy === state.currentUser.id
+            ? undefined
+            : gift.reservedBy
       }
-      break
-    case "ADD_GIFT":
-      draft.gifts.push({
-        id: Math.random() * 100000,
-        description: action.gift,
-        image: action.image,
-        reservedBy: undefined
-      })
-      break
+    })
   }
-})
+}
+
+export function addGift(state, gift, image) {
+  return {
+    ...state,
+    gifts: [
+      ...state.gifts,
+      {
+        id: Math.random() * 100000,
+        description: gift,
+        image,
+        reservedBy: undefined
+      }
+    ]
+  }
+}
