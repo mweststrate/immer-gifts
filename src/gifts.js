@@ -31,9 +31,6 @@ export const reducer = produce((draft, action) => {
   switch (action.type) {
     case "RESET":
       return initialState
-    case "APPLY_PATCHES":
-      applyPatches(draft, action.patches)
-      break
     case "TOGGLE_RESERVE":
       const gift = draft.gifts.find(gift => gift.id === action.id)
       if (gift) {
