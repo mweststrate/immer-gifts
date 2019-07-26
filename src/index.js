@@ -1,31 +1,23 @@
-import React, { useReducer } from "react"
+import React, { useReducer, useCallback } from "react"
 import ReactDOM from "react-dom"
 import "./index.css"
 import { initialState, reducer } from "./gifts"
 
-const Gift = React.memo(({ gift, users, currentUser, dispatch }) => {
-  const handleReserveClick = () => {
-    dispatch({
-      type: "TOGGLE_RESERVE",
-      id: gift.id
-    })
-  }
-  return (
-    <div className={`gift ${gift.reservedBy ? "reserved" : ""}`}>
-      <img src={gift.image} alt="gift" />
-      <div className="description">
-        <h2>{gift.description}</h2>
-      </div>
-      <div className="reservation">
-        {!gift.reservedBy || gift.reservedBy === currentUser.id ? (
-          <button onClick={handleReserveClick}>{gift.reservedBy ? "Unreserve" : "Reserve"}</button>
-        ) : (
-          <span>{users[gift.reservedBy].name}</span>
-        )}
-      </div>
+const Gift = React.memo(({ gift, users, currentUser, onReserve }) => (
+  <div className={`gift ${gift.reservedBy ? "reserved" : ""}`}>
+    <img src={gift.image} alt="gift" />
+    <div className="description">
+      <h2>{gift.description}</h2>
     </div>
-  )
-})
+    <div className="reservation">
+      {!gift.reservedBy || gift.reservedBy === currentUser.id ? (
+        <button onClick={() => onReserve(gift.id)}>{gift.reservedBy ? "Unreserve" : "Reserve"}</button>
+      ) : (
+        <span>{users[gift.reservedBy].name}</span>
+      )}
+    </div>
+  </div>
+))
 
 function GiftList() {
   const [state, dispatch] = useReducer(reducer, initialState)
@@ -46,6 +38,13 @@ function GiftList() {
       })
   }
 
+  const handleReserve = useCallback(id => {
+    dispatch({
+      type: "TOGGLE_RESERVE",
+      id
+    })
+  }, [])
+
   return (
     <div className="app">
       <div className="header">
@@ -57,7 +56,7 @@ function GiftList() {
       </div>
       <div className="gifts">
         {gifts.map(gift => (
-          <Gift key={gift.id} gift={gift} users={users} currentUser={currentUser} dispatch={dispatch} />
+          <Gift key={gift.id} gift={gift} users={users} currentUser={currentUser} onReserve={handleReserve} />
         ))}
       </div>
     </div>
