@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react"
 import ReactDOM from "react-dom"
 import "./index.css"
-import { initialState, reset, toggleReservation, addGift } from "./gifts"
+import { initialState, toggleReservation, addGift } from "./gifts"
 
 const Gift = React.memo(({ gift, users, currentUser, onReserve }) => (
   <div className={`gift ${gift.reservedBy ? "reserved" : ""}`}>
