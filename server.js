@@ -1,5 +1,9 @@
-var WebSocketServer = require("ws").Server
-var wss = new WebSocketServer({ port: 5001 })
+import { Server as WebSocketServer } from "ws"
+import { applyPatches } from "immer"
+import { initialState } from "./src/gifts"
+import { produceWithPatches } from "./src/utils"
+
+const wss = new WebSocketServer({ port: 5001 })
 
 /**
  * Connected clients
@@ -9,7 +13,7 @@ const connections = []
 /**
  * State as seen by server
  */
-const history = []
+let history = []
 
 wss.on("connection", function connection(ws) {
   /**
@@ -44,3 +48,16 @@ wss.on("connection", function connection(ws) {
    */
   ws.send(JSON.stringify(history))
 })
+
+// TODO: test
+export function compressHistory(currentPatches) {
+  const [_finalState, patches] = produceWithPatches(initialState, draft => {
+    applyPatches(draft, currentPatches)
+  })
+  console.log(`compressed patches from ${history.length} to ${patches.length} patches`)
+  return patches
+}
+
+setInterval(() => {
+  history = compressHistory(history)
+}, 5000)

@@ -33,6 +33,7 @@ const giftsProducer = (draft, action) => {
   switch (action.type) {
     case "APPLY_PATCHES":
       applyPatches(draft, action.patches)
+      // TODO: fix that this also works for reset!
       break
     case "RESET":
       return initialState
