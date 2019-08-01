@@ -71,8 +71,8 @@ function GiftList() {
         <button onClick={handleReset}>Reset</button>
       </div>
       <div className="gifts">
-        {gifts.map(gift => (
-          <Gift key={gift.id} gift={gift} users={users} currentUser={currentUser} onReserve={handleReserve} />
+        {Object.entries(gifts).map(([id, gift]) => (
+          <Gift key={id} gift={gift} users={users} currentUser={currentUser} onReserve={handleReserve} />
         ))}
       </div>
     </div>
