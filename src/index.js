@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useCallback } from "react"
+import React, { useState, useCallback, useRef } from "react"
 import ReactDOM from "react-dom"
 import "./index.css"
 import { initialState, patchGeneratingReducer, reducer } from "./gifts"
@@ -23,22 +23,32 @@ const Gift = React.memo(({ gift, users, currentUser, onReserve }) => (
 
 function GiftList() {
   const [state, setState] = useState(initialState)
+  const undoStack = useRef([])
 
   const send = useSocket("ws://localhost:5001", function onMessage(patches) {
+    // update state, don't distribute, don't record undo
     setState(state => reducer(state, { type: "APPLY_PATCHES", patches }))
   })
 
-  const dispatch = useCallback(action => {
+  const dispatch = useCallback((action, undoable = true) => {
     setState(currentState => {
-      const [nextState, patches] = patchGeneratingReducer(currentState, action)
-      // console.dir(patches)
+      const [nextState, patches, inversePatches] = patchGeneratingReducer(currentState, action)
+      // if the changes are made local, we want to...
+      // ... record on the undo stack (unless undoing atm)
+      if (undoable) undoStack.current.push(inversePatches)
+      // ... distribute the changes
       send(patches)
       return nextState
     })
   }, [])
 
   const { users, gifts, currentUser } = state
-  // console.dir(state)
+
+  const handleUndo = () => {
+    if (!undoStack.current.length) return
+    const patches = undoStack.current.pop()
+    dispatch({ type: "APPLY_PATCHES", patches }, false)
+  }
 
   const handleReset = () => {
     dispatch({ type: "RESET" })
@@ -67,6 +77,7 @@ function GiftList() {
         <h1>Hi, {currentUser.name}</h1>
       </div>
       <div className="actions">
+        <button onClick={handleUndo}>Undo</button>
         <button onClick={handleAdd}>Add</button>
         <button onClick={handleReset}>Reset</button>
       </div>
