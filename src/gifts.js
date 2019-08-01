@@ -1,6 +1,7 @@
 /* eslint-disable default-case */
 import produce, { applyPatches } from "immer"
 import { allUsers, getCurrentUser } from "./users"
+import { produceWithPatches } from "./utils"
 
 export const initialState = {
   users: allUsers,
@@ -27,8 +28,11 @@ export const initialState = {
   ]
 }
 
-export const reducer = produce((draft, action) => {
+const giftsProducer = (draft, action) => {
   switch (action.type) {
+    case "APPLY_PATCHES":
+      applyPatches(draft, action.patches)
+      break
     case "RESET":
       return initialState
     case "TOGGLE_RESERVE":
@@ -53,4 +57,8 @@ export const reducer = produce((draft, action) => {
       })
       break
   }
-})
+}
+
+export const reducer = produce(giftsProducer)
+
+export const patchGeneratingReducer = produceWithPatches(giftsProducer)

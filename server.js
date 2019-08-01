@@ -23,7 +23,7 @@ wss.on("connection", function connection(ws) {
    */
   ws.on("message", function incoming(message) {
     console.log(message)
-    history.push(...JSON.parse(message).patches)
+    history.push(...JSON.parse(message))
     connections
       .filter(client => client !== ws)
       .forEach(client => {
@@ -42,10 +42,5 @@ wss.on("connection", function connection(ws) {
   /**
    * Send initial state
    */
-  ws.send(
-    JSON.stringify({
-      type: "APPLY_PATCHES",
-      patches: history
-    })
-  )
+  ws.send(JSON.stringify(history))
 })

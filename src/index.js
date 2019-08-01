@@ -1,7 +1,9 @@
-import React, { useReducer, useCallback } from "react"
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useState, useCallback } from "react"
 import ReactDOM from "react-dom"
 import "./index.css"
-import { initialState, reducer } from "./gifts"
+import { initialState, patchGeneratingReducer, reducer } from "./gifts"
+import { useSocket } from "./utils"
 
 const Gift = React.memo(({ gift, users, currentUser, onReserve }) => (
   <div className={`gift ${gift.reservedBy ? "reserved" : ""}`}>
@@ -20,7 +22,21 @@ const Gift = React.memo(({ gift, users, currentUser, onReserve }) => (
 ))
 
 function GiftList() {
-  const [state, dispatch] = useReducer(reducer, initialState)
+  const [state, setState] = useState(initialState)
+
+  const send = useSocket("ws://localhost:5001", function onMessage(patches) {
+    setState(state => reducer(state, { type: "APPLY_PATCHES", patches }))
+  })
+
+  const dispatch = useCallback(action => {
+    setState(currentState => {
+      const [nextState, patches] = patchGeneratingReducer(currentState, action)
+      // console.dir(patches)
+      send(patches)
+      return nextState
+    })
+  }, [])
+
   const { users, gifts, currentUser } = state
   // console.dir(state)
 
