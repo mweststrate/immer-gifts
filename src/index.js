@@ -50,7 +50,7 @@ function GiftList() {
       dispatch({
         type: "ADD_GIFT",
         gift,
-        image: "https://picsum.photos/200?q=" + Math.random()
+        image: `https://picsum.photos/id/${Math.round(Math.random() * 1000)}/200/200`
       })
   }
 
