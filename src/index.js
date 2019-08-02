@@ -24,9 +24,11 @@ const Gift = React.memo(({ gift, users, currentUser, onReserve }) => (
 function GiftList() {
   const [state, setState] = useState(initialState)
   const undoStack = useRef([])
+  const undoStackPointer = useRef(-1)
 
   const send = useSocket("ws://localhost:5001", function onMessage(patches) {
     // update state, don't distribute, don't record undo
+    console.dir(patches)
     setState(state => reducer(state, { type: "APPLY_PATCHES", patches }))
   })
 
@@ -35,7 +37,11 @@ function GiftList() {
       const [nextState, patches, inversePatches] = patchGeneratingReducer(currentState, action)
       // if the changes are made local, we want to...
       // ... record on the undo stack (unless undoing atm)
-      if (undoable) undoStack.current.push(inversePatches)
+      if (undoable) {
+        const pointer = ++undoStackPointer.current
+        undoStack.current.length = pointer
+        undoStack.current[pointer] = { patches, inversePatches }
+      }
       // ... distribute the changes
       send(patches)
       return nextState
@@ -45,8 +51,14 @@ function GiftList() {
   const { users, gifts, currentUser } = state
 
   const handleUndo = () => {
-    if (!undoStack.current.length) return
-    const patches = undoStack.current.pop()
+    const patches = undoStack.current[undoStackPointer.current].inversePatches
+    dispatch({ type: "APPLY_PATCHES", patches }, false)
+    undoStackPointer.current--
+  }
+
+  const handleRedo = () => {
+    undoStackPointer.current++
+    const patches = undoStack.current[undoStackPointer.current].patches
     dispatch({ type: "APPLY_PATCHES", patches }, false)
   }
 
@@ -77,7 +89,12 @@ function GiftList() {
         <h1>Hi, {currentUser.name}</h1>
       </div>
       <div className="actions">
-        <button onClick={handleUndo}>Undo</button>
+        <button onClick={handleUndo} disabled={undoStackPointer.current < 0}>
+          Undo
+        </button>
+        <button onClick={handleRedo} disabled={undoStackPointer.current === undoStack.current.length - 1}>
+          Redo
+        </button>
         <button onClick={handleAdd}>Add</button>
         <button onClick={handleReset}>Reset</button>
       </div>
