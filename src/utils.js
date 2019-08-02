@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react"
-import produce from "immer"
+import { useEffect, useCallback, useRef } from "react"
 
 export function useSocket(url, onMessage) {
   const socket = useRef()
@@ -23,17 +22,4 @@ export function useSocket(url, onMessage) {
   return useCallback(data => {
     socket.current.send(JSON.stringify(data))
   }, [])
-}
-
-export function produceWithPatches(arg1, arg2) {
-  if (typeof arg1 === "function") {
-    return (state, ...args) => produceWithPatches(state, draft => arg1(draft, ...args))
-  }
-  // non-curried form
-  let patches, inversePatches
-  const nextState = produce(arg1, arg2, (p, ip) => {
-    patches = p
-    inversePatches = ip
-  })
-  return [nextState, patches, inversePatches]
 }

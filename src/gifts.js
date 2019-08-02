@@ -1,7 +1,6 @@
 /* eslint-disable default-case */
-import produce, { applyPatches } from "immer"
+import produce, { applyPatches, produceWithPatches } from "immer"
 import { allUsers, getCurrentUser } from "./users"
-import { produceWithPatches } from "./utils"
 import * as uuid from "uuid"
 
 export const initialState = {
@@ -32,9 +31,7 @@ export const initialState = {
 const giftsProducer = (draft, action) => {
   switch (action.type) {
     case "APPLY_PATCHES":
-      applyPatches(draft, action.patches)
-      // TODO: fix that this also works for reset!
-      break
+      return applyPatches(draft, action.patches)
     case "RESET":
       return initialState
     case "TOGGLE_RESERVE":
