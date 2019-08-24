@@ -58,3 +58,22 @@ export function addGift(state, gift, image) {
     ]
   }
 }
+
+export async function addBook(state, isbn) {
+  const response = await fetch(`http://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&jscmd=data&format=json`, {
+    mode: "cors"
+  })
+  const book = (await response.json())["ISBN:" + isbn]
+  return {
+    ...state,
+    gifts: [
+      ...state.gifts,
+      {
+        id: isbn,
+        description: book.title,
+        image: book.cover.medium,
+        reservedBy: undefined
+      }
+    ]
+  }
+}

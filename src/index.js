@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react"
 import ReactDOM from "react-dom"
 import "./index.css"
-import { initialState, toggleReservation, addGift } from "./gifts"
+import { initialState, toggleReservation, addGift, addBook } from "./gifts"
 
 const Gift = React.memo(({ gift, users, currentUser, onReserve }) => (
   <div className={`gift ${gift.reservedBy ? "reserved" : ""}`}>
@@ -24,12 +24,20 @@ function GiftList() {
   const { users, gifts, currentUser } = state
 
   const handleReset = () => {
-    setState(state => initialState)
+    setState(initialState)
   }
 
   const handleAdd = () => {
     const gift = prompt("Gift to add")
     if (gift) setState(state => addGift(state, gift, "https://picsum.photos/200?q=" + Math.random()))
+  }
+
+  const handleAddBook = async () => {
+    const isbn = prompt("Enter ISBN number", "0201558025")
+    if (isbn) {
+      const nextState = await addBook(state, isbn)
+      setState(nextState)
+    }
   }
 
   const handleReserve = useCallback(id => {
@@ -43,6 +51,7 @@ function GiftList() {
       </div>
       <div className="actions">
         <button onClick={handleAdd}>Add</button>
+        <button onClick={handleAddBook}>AddBook</button>
         <button onClick={handleReset}>Reset</button>
       </div>
       <div className="gifts">
