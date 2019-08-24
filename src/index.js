@@ -1,7 +1,8 @@
-import React from "react"
+import React, { useState } from "react"
 import ReactDOM from "react-dom"
+import uuidv4 from "uuid/v4"
 
-import { getInitialState } from "./gifts"
+import { getInitialState, addGift, toggleReservation } from "./gifts"
 
 import "./misc/index.css"
 
@@ -22,12 +23,18 @@ const Gift = ({ gift, users, currentUser, onReserve }) => (
 )
 
 function GiftList() {
-  const state = getInitialState()
+  const [state, setState] = useState(() => getInitialState())
   const { users, gifts, currentUser } = state
 
-  const handleAdd = () => {}
+  const handleAdd = () => {
+    const description = prompt("Gift to add")
+    if (description)
+      setState(state => addGift(state, uuidv4(), description, "https://picsum.photos/200?q=" + Math.random()))
+  }
 
-  const handleReserve = id => {}
+  const handleReserve = id => {
+    setState(state => toggleReservation(state, id))
+  }
 
   return (
     <div className="app">
