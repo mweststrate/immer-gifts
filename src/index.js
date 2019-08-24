@@ -1,4 +1,4 @@
-import React, { useState, memo } from "react"
+import React, { useState, memo, useCallback } from "react"
 import ReactDOM from "react-dom"
 import uuidv4 from "uuid/v4"
 
@@ -32,9 +32,9 @@ function GiftList() {
       setState(state => addGift(state, uuidv4(), description, "https://picsum.photos/200?q=" + Math.random()))
   }
 
-  const handleReserve = id => {
+  const handleReserve = useCallback(id => {
     setState(state => toggleReservation(state, id))
-  }
+  }, [])
 
   return (
     <div className="app">
