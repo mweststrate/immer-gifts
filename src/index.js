@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, memo } from "react"
 import ReactDOM from "react-dom"
 import uuidv4 from "uuid/v4"
 
@@ -6,7 +6,7 @@ import { getInitialState, addGift, toggleReservation } from "./gifts"
 
 import "./misc/index.css"
 
-const Gift = ({ gift, users, currentUser, onReserve }) => (
+const Gift = memo(({ gift, users, currentUser, onReserve }) => (
   <div className={`gift ${gift.reservedBy ? "reserved" : ""}`}>
     <img src={gift.image} alt="gift" />
     <div className="description">
@@ -20,7 +20,7 @@ const Gift = ({ gift, users, currentUser, onReserve }) => (
       )}
     </div>
   </div>
-)
+))
 
 function GiftList() {
   const [state, setState] = useState(() => getInitialState())
