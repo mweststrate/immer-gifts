@@ -1,9 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useCallback, useRef } from "react"
 import ReactDOM from "react-dom"
-import "./index.css"
+
+import "./misc/index.css"
 import { initialState, patchGeneratingReducer, reducer } from "./gifts"
-import { useSocket } from "./utils"
+import { useSocket } from "./misc/useSocket"
 
 const Gift = React.memo(({ gift, users, currentUser, onReserve }) => (
   <div className={`gift ${gift.reservedBy ? "reserved" : ""}`}>
