@@ -1,5 +1,13 @@
-This project was inspired by:
+This is the demo project of the egghead.io advanced immer course.
 
-https://codepen.io/gaearon/pen/gWWZgR?editors=0110
+To run
+
+```
+yarn
+yarn start-server &
+yarn start
+```
+
+Use `yarn test` to run tests.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
