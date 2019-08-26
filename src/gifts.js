@@ -22,8 +22,7 @@ export const toggleReservation = produce((draft, giftId) => {
       : gift.reservedBy
 })
 
-export async function addBook(state, isbn) {
-  const draft = createDraft(state)
+export const addBook = produce(async (draft, isbn) => {
   const response = await fetch(`http://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&jscmd=data&format=json`, {
     mode: "cors"
   })
@@ -34,8 +33,7 @@ export async function addBook(state, isbn) {
     image: book.cover.medium,
     reservedBy: undefined
   })
-  return finishDraft(draft)
-}
+})
 
 export function getInitialState() {
   return {
