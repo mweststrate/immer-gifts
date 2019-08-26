@@ -1,4 +1,4 @@
-import produce from "immer"
+import produce, { Draft } from "immer"
 
 import { allUsers, getCurrentUser } from "./misc/users"
 import defaultGifts from "./misc/gifts.json"
@@ -29,7 +29,7 @@ interface Book {
   }
 }
 
-export const addGift = produce((draft: State, id: string, description: string, image: string) => {
+export const addGift = produce((draft: Draft<State>, id: string, description: string, image: string) => {
   draft.gifts.push({
     id,
     description,
@@ -38,7 +38,7 @@ export const addGift = produce((draft: State, id: string, description: string, i
   })
 })
 
-export const toggleReservation = produce((draft: State, giftId: string) => {
+export const toggleReservation = produce((draft: Draft<State>, giftId: string) => {
   const gift = draft.gifts.find(gift => gift.id === giftId)!
   gift.reservedBy =
     gift.reservedBy === undefined
@@ -56,7 +56,7 @@ export async function getBookDetails(isbn: string): Promise<Book> {
   return book
 }
 
-export const addBook = produce((draft: State, book: Book) => {
+export const addBook = produce((draft: Draft<State>, book: Book) => {
   draft.gifts.push({
     id: book.isbn,
     description: book.title,
