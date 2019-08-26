@@ -3,7 +3,33 @@ import produce from "immer"
 import { allUsers, getCurrentUser } from "./misc/users"
 import defaultGifts from "./misc/gifts.json"
 
-export const addGift = produce((draft, id, description, image) => {
+interface Gift {
+  id: string
+  description: string
+  image: string
+  reservedBy?: number
+}
+
+interface User {
+  id: number
+  name: string
+}
+
+interface State {
+  users: User[]
+  currentUser: User
+  gifts: Gift[]
+}
+
+interface Book {
+  isbn: string
+  title: string
+  cover: {
+    medium: string
+  }
+}
+
+export const addGift = produce((draft: State, id: string, description: string, image: string) => {
   draft.gifts.push({
     id,
     description,
@@ -12,8 +38,8 @@ export const addGift = produce((draft, id, description, image) => {
   })
 })
 
-export const toggleReservation = produce((draft, giftId) => {
-  const gift = draft.gifts.find(gift => gift.id === giftId)
+export const toggleReservation = produce((draft: State, giftId: string) => {
+  const gift = draft.gifts.find(gift => gift.id === giftId)!
   gift.reservedBy =
     gift.reservedBy === undefined
       ? draft.currentUser.id
@@ -22,7 +48,7 @@ export const toggleReservation = produce((draft, giftId) => {
       : gift.reservedBy
 })
 
-export async function getBookDetails(isbn) {
+export async function getBookDetails(isbn: string): Promise<Book> {
   const response = await fetch(`http://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&jscmd=data&format=json`, {
     mode: "cors"
   })
@@ -30,7 +56,7 @@ export async function getBookDetails(isbn) {
   return book
 }
 
-export const addBook = produce((draft, book) => {
+export const addBook = produce((draft: State, book: Book) => {
   draft.gifts.push({
     id: book.isbn,
     description: book.title,
@@ -39,7 +65,7 @@ export const addBook = produce((draft, book) => {
   })
 })
 
-export function getInitialState() {
+export function getInitialState(): State {
   return {
     users: allUsers,
     currentUser: getCurrentUser(),

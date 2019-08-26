@@ -1,6 +1,6 @@
-import { toggleReservation, addGift, addBook, getBookDetails } from "./gifts"
+import { State, toggleReservation, addGift, addBook, getBookDetails } from "./gifts"
 
-const initialState = {
+const initialState: State = {
   users: [
     {
       id: 1,
