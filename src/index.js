@@ -54,7 +54,13 @@ function GiftList() {
 
   const handleReset = () => {
     updateState(draft => {
-      getInitialState()
+      draft = getInitialState()
+
+      function increment(x) {
+        x = x + 1
+      }
+      let y = 2
+      inc(y)
     })
   }
 
