@@ -59,7 +59,9 @@ describe("Reserving an unreserved gift", () => {
   })
 
   test("can't accidentally modify the produced state", () => {
-    nextState.gifts[1].reservedBy = undefined
+    expect(() => {
+      nextState.gifts[1].reservedBy = undefined
+    }).toThrow("read only")
   })
 })
 
