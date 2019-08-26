@@ -24,13 +24,13 @@ const Gift = memo(({ gift, users, currentUser, onReserve }) => (
 ))
 
 function GiftList() {
-  const [state, setState] = useImmer(() => getInitialState())
+  const [state, updateState] = useImmer(() => getInitialState())
   const { users, gifts, currentUser } = state
 
   const handleAdd = () => {
     const description = prompt("Gift to add")
     if (description)
-      setState(draft => {
+      updateState(draft => {
         draft.gifts.push({
           id: uuidv4(),
           description,
@@ -41,7 +41,7 @@ function GiftList() {
   }
 
   const handleReserve = useCallback(id => {
-    setState(draft => {
+    updateState(draft => {
       const gift = draft.gifts.find(gift => gift.id === id)
       gift.reservedBy =
         gift.reservedBy === undefined
