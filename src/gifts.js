@@ -1,4 +1,4 @@
-import produce from "immer"
+import produce, { createDraft, finishDraft } from "immer"
 
 import { allUsers, getCurrentUser } from "./misc/users"
 import defaultGifts from "./misc/gifts"
@@ -23,22 +23,18 @@ export const toggleReservation = produce((draft, giftId) => {
 })
 
 export async function addBook(state, isbn) {
+  const draft = createDraft(state)
   const response = await fetch(`http://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&jscmd=data&format=json`, {
     mode: "cors"
   })
   const book = (await response.json())["ISBN:" + isbn]
-  return {
-    ...state,
-    gifts: [
-      ...state.gifts,
-      {
-        id: isbn,
-        description: book.title,
-        image: book.cover.medium,
-        reservedBy: undefined
-      }
-    ]
-  }
+  draft.gifts.push({
+    id: isbn,
+    description: book.title,
+    image: book.cover.medium,
+    reservedBy: undefined
+  })
+  return finishDraft(draft)
 }
 
 export function getInitialState() {
