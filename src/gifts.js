@@ -1,25 +1,39 @@
-import produce, { createDraft, finishDraft } from "immer"
+/* eslint-disable default-case */
+import produce from "immer"
 
 import { allUsers, getCurrentUser } from "./misc/users"
 import defaultGifts from "./misc/gifts"
 
-export const addGift = produce((draft, id, description, image) => {
-  draft.gifts.push({
-    id,
-    description,
-    image,
-    reservedBy: undefined
-  })
-})
-
-export const toggleReservation = produce((draft, giftId) => {
-  const gift = draft.gifts.find(gift => gift.id === giftId)
-  gift.reservedBy =
-    gift.reservedBy === undefined
-      ? draft.currentUser.id
-      : gift.reservedBy === draft.currentUser.id
-      ? undefined
-      : gift.reservedBy
+export const giftsReducer = produce((draft, action) => {
+  switch (action.type) {
+    case "ADD_GIFT":
+      const { id, description, image } = action
+      draft.gifts.push({
+        id,
+        description,
+        image,
+        reservedBy: undefined
+      })
+      break
+    case "TOGGLE_RESERVATION":
+      const gift = draft.gifts.find(gift => gift.id === action.id)
+      gift.reservedBy =
+        gift.reservedBy === undefined
+          ? draft.currentUser.id
+          : gift.reservedBy === draft.currentUser.id
+          ? undefined
+          : gift.reservedBy
+      break
+    case "ADD_BOOK":
+      const { book } = action
+      draft.gifts.push({
+        id: book.isbn,
+        description: book.title,
+        image: book.cover.medium,
+        reservedBy: undefined
+      })
+      break
+  }
 })
 
 export async function getBookDetails(isbn) {
@@ -29,15 +43,6 @@ export async function getBookDetails(isbn) {
   const book = (await response.json())["ISBN:" + isbn]
   return book
 }
-
-export const addBook = produce((draft, book) => {
-  draft.gifts.push({
-    id: book.isbn,
-    description: book.title,
-    image: book.cover.medium,
-    reservedBy: undefined
-  })
-})
 
 export function getInitialState() {
   return {
