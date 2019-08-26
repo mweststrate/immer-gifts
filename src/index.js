@@ -34,8 +34,8 @@ function GiftList() {
   }
 
   const handleReserve = useCallback(id => {
-    setState(state => {
-      return produce(state, draft => {
+    setState(
+      produce(draft => {
         const gift = draft.gifts.find(gift => gift.id === id)
         gift.reservedBy =
           gift.reservedBy === undefined
@@ -44,7 +44,7 @@ function GiftList() {
             ? undefined
             : gift.reservedBy
       })
-    })
+    )
   }, [])
 
   return (
