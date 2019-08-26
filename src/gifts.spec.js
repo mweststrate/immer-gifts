@@ -88,4 +88,11 @@ describe("Can add books async", () => {
     const nextState = await addBook(initialState, "0201558025")
     expect(nextState.gifts[2].description).toBe("Concrete mathematics")
   })
+
+  test("Can add two books in parallel", async () => {
+    const promise1 = addBook(initialState, "0201558025")
+    const promise2 = addBook(initialState, "9781598560169")
+    const nextState = await promise2 // Or 1?!
+    expect(nextState.gifts.length).toBe(4)
+  })
 })
