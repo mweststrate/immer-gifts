@@ -1,4 +1,4 @@
-import { toggleReservation, addGift } from "./gifts"
+import { toggleReservation, addGift, addBook } from "./gifts"
 
 const initialState = {
   users: [
@@ -80,5 +80,12 @@ describe("Reserving an already reserved gift", () => {
   test("still produces a new state", () => {
     expect(nextState).toEqual(initialState)
     expect(nextState).toBe(initialState)
+  })
+})
+
+describe("Can add books async", () => {
+  test("Can add math book", async () => {
+    const nextState = await addBook(initialState, "0201558025")
+    expect(nextState.gifts[2].description).toBe("Concrete mathematics")
   })
 })
