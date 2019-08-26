@@ -2,7 +2,7 @@ import React, { useState, memo, useCallback } from "react"
 import ReactDOM from "react-dom"
 import uuidv4 from "uuid/v4"
 
-import { getInitialState, addGift, toggleReservation, addBook } from "./gifts"
+import { getInitialState, addGift, toggleReservation, addBook, getBookDetails } from "./gifts"
 
 import "./misc/index.css"
 
@@ -39,8 +39,8 @@ function GiftList() {
   const handleAddBook = async () => {
     const isbn = prompt("Enter ISBN number", "0201558025")
     if (isbn) {
-      const nextState = await addBook(state, isbn)
-      setState(nextState)
+      const details = await getBookDetails(isbn)
+      setState(state => addBook(state, details))
     }
   }
 
