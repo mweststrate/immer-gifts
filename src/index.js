@@ -55,6 +55,10 @@ function GiftList() {
     }
   }
 
+  const handleReset = () => {
+    dispatch({ type: "RESET" })
+  }
+
   return (
     <div className="app">
       <div className="header">
@@ -63,6 +67,7 @@ function GiftList() {
       <div className="actions">
         <button onClick={handleAdd}>Add</button>
         <button onClick={handleAddBook}>Add Book</button>
+        <button onClick={handleReset}>Reset</button>
       </div>
       <div className="gifts">
         {gifts.map(gift => (

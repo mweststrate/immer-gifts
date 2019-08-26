@@ -33,6 +33,8 @@ export const giftsReducer = produce((draft, action) => {
         reservedBy: undefined
       })
       break
+    case "RESET":
+      return getInitialState()
   }
 })
 
