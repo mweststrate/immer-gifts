@@ -1,6 +1,6 @@
 import { State, toggleReservation, addGift, addBook, getBookDetails } from "./gifts"
 
-const initialState: State = {
+const initialState = {
   users: [
     {
       id: 1,
@@ -60,7 +60,7 @@ describe("Reserving an unreserved gift", () => {
 
   test("can't accidentally modify the produced state", () => {
     expect(() => {
-      ;(nextState.gifts[1] as any).reservedBy = undefined
+      nextState.gifts[1].reservedBy = undefined
     }).toThrow("read only")
   })
 })
