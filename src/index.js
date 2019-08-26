@@ -54,13 +54,7 @@ function GiftList() {
 
   const handleReset = () => {
     updateState(draft => {
-      draft = getInitialState()
-
-      function increment(x) {
-        x = x + 1
-      }
-      let y = 2
-      inc(y)
+      return getInitialState()
     })
   }
 
@@ -71,7 +65,7 @@ function GiftList() {
       </div>
       <div className="actions">
         <button onClick={handleAdd}>Add</button>
-        <button onClick={handleReset}>handleReset</button>
+        <button onClick={handleReset}>Reset</button>
       </div>
       <div className="gifts">
         {gifts.map(gift => (
