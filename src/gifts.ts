@@ -4,28 +4,28 @@ import { allUsers, getCurrentUser } from "./misc/users"
 import defaultGifts from "./misc/gifts.json"
 
 interface Gift {
-  id: string
-  description: string
-  image: string
-  reservedBy?: number
+  readonly id: string
+  readonly description: string
+  readonly image: string
+  readonly reservedBy?: number
 }
 
 interface User {
-  id: number
-  name: string
+  readonly id: number
+  readonly name: string
 }
 
-interface State {
-  users: User[]
-  currentUser: User
-  gifts: Gift[]
+export interface State {
+  readonly users: readonly User[]
+  readonly currentUser: User
+  readonly gifts: readonly Gift[]
 }
 
 interface Book {
-  isbn: string
-  title: string
-  cover: {
-    medium: string
+  readonly isbn: string
+  readonly title: string
+  readonly cover: {
+    readonly medium: string
   }
 }
 
