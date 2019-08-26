@@ -1,7 +1,7 @@
-import produce, { createDraft, finishDraft } from "immer"
+import produce from "immer"
 
 import { allUsers, getCurrentUser } from "./misc/users"
-import defaultGifts from "./misc/gifts"
+import defaultGifts from "./misc/gifts.json"
 
 export const addGift = produce((draft, id, description, image) => {
   draft.gifts.push({
