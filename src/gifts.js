@@ -1,35 +1,9 @@
-import produce, { Draft } from "immer"
+import produce, { createDraft, finishDraft } from "immer"
 
 import { allUsers, getCurrentUser } from "./misc/users"
-import defaultGifts from "./misc/gifts.json"
+import defaultGifts from "./misc/gifts"
 
-interface Gift {
-  readonly id: string
-  readonly description: string
-  readonly image: string
-  readonly reservedBy?: number
-}
-
-interface User {
-  readonly id: number
-  readonly name: string
-}
-
-export interface State {
-  readonly users: readonly User[]
-  readonly currentUser: User
-  readonly gifts: readonly Gift[]
-}
-
-interface Book {
-  readonly isbn: string
-  readonly title: string
-  readonly cover: {
-    readonly medium: string
-  }
-}
-
-export const addGift = produce((draft: Draft<State>, id: string, description: string, image: string) => {
+export const addGift = produce((draft, id, description, image) => {
   draft.gifts.push({
     id,
     description,
@@ -38,8 +12,8 @@ export const addGift = produce((draft: Draft<State>, id: string, description: st
   })
 })
 
-export const toggleReservation = produce((draft: Draft<State>, giftId: string) => {
-  const gift = draft.gifts.find(gift => gift.id === giftId)!
+export const toggleReservation = produce((draft, giftId) => {
+  const gift = draft.gifts.find(gift => gift.id === giftId)
   gift.reservedBy =
     gift.reservedBy === undefined
       ? draft.currentUser.id
@@ -48,7 +22,7 @@ export const toggleReservation = produce((draft: Draft<State>, giftId: string) =
       : gift.reservedBy
 })
 
-export async function getBookDetails(isbn: string): Promise<Book> {
+export async function getBookDetails(isbn) {
   const response = await fetch(`http://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&jscmd=data&format=json`, {
     mode: "cors"
   })
@@ -56,7 +30,7 @@ export async function getBookDetails(isbn: string): Promise<Book> {
   return book
 }
 
-export const addBook = produce((draft: Draft<State>, book: Book) => {
+export const addBook = produce((draft, book) => {
   draft.gifts.push({
     id: book.isbn,
     description: book.title,
@@ -65,7 +39,7 @@ export const addBook = produce((draft: Draft<State>, book: Book) => {
   })
 })
 
-export function getInitialState(): State {
+export function getInitialState() {
   return {
     users: allUsers,
     currentUser: getCurrentUser(),
