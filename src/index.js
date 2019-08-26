@@ -1,8 +1,9 @@
 import React, { useState, memo, useCallback } from "react"
 import ReactDOM from "react-dom"
 import uuidv4 from "uuid/v4"
+import produce from "immer"
 
-import { getInitialState, addGift, toggleReservation } from "./gifts"
+import { getInitialState, addGift } from "./gifts"
 
 import "./misc/index.css"
 
@@ -33,7 +34,17 @@ function GiftList() {
   }
 
   const handleReserve = useCallback(id => {
-    setState(state => toggleReservation(state, id))
+    setState(state => {
+      return produce(state, draft => {
+        const gift = draft.gifts.find(gift => gift.id === id)
+        gift.reservedBy =
+          gift.reservedBy === undefined
+            ? draft.currentUser.id
+            : gift.reservedBy === draft.currentUser.id
+            ? undefined
+            : gift.reservedBy
+      })
+    })
   }, [])
 
   return (
