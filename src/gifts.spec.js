@@ -58,7 +58,7 @@ describe("Reserving an unreserved gift", () => {
     expect(nextState.gifts[0]).toBe(initialState.gifts[0])
   })
 
-  test("can't accidentally modify the produced state", () => {
+  test.skip("can't accidentally modify the produced state", () => {
     expect(() => {
       nextState.gifts[1].reservedBy = undefined
     }).toThrow("read only")
@@ -70,5 +70,15 @@ describe("Reserving an already reserved gift", () => {
 
   test("preserves stored reservedBy", () => {
     expect(nextState.gifts[0].reservedBy).toBe(2) // Someone else
+  })
+
+  test("still produces a new gift", () => {
+    expect(nextState.gifts[0]).toEqual(initialState.gifts[0])
+    expect(nextState.gifts[0]).not.toBe(initialState.gifts[0])
+  })
+
+  test("still produces a new state", () => {
+    expect(nextState).toEqual(initialState)
+    expect(nextState).not.toBe(initialState)
   })
 })

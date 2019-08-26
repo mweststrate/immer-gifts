@@ -12,15 +12,23 @@ export const addGift = produce((draft, id, description, image) => {
   })
 })
 
-export const toggleReservation = produce((draft, giftId) => {
-  const gift = draft.gifts.find(gift => gift.id === giftId)
-  gift.reservedBy =
-    gift.reservedBy === undefined
-      ? draft.currentUser.id
-      : gift.reservedBy === draft.currentUser.id
-      ? undefined
-      : gift.reservedBy
-})
+export function toggleReservation(state, giftId) {
+  return {
+    ...state,
+    gifts: state.gifts.map(gift => {
+      if (gift.id !== giftId) return gift
+      return {
+        ...gift,
+        reservedBy:
+          gift.reservedBy === undefined
+            ? state.currentUser.id
+            : gift.reservedBy === state.currentUser.id
+            ? undefined
+            : gift.reservedBy
+      }
+    })
+  }
+}
 
 export function getInitialState() {
   return {
