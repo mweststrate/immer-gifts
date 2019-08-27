@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, memo, useCallback } from "react"
+import React, { useState, memo, useCallback, useRef } from "react"
 import ReactDOM from "react-dom"
 import uuidv4 from "uuid/v4"
 
@@ -27,12 +27,15 @@ const Gift = memo(({ gift, users, currentUser, onReserve }) => (
 
 function GiftList() {
   const [state, setState] = useState(() => getInitialState())
+  const undoStack = useRef([])
+
   const { users, gifts, currentUser } = state
 
   const dispatch = useCallback(action => {
     setState(currentState => {
-      const [nextState, patches] = patchGeneratingGiftsReducer(currentState, action)
+      const [nextState, patches, inversePatches] = patchGeneratingGiftsReducer(currentState, action)
       send(patches)
+      undoStack.current.push(inversePatches)
       return nextState
     })
   }, [])
@@ -41,6 +44,12 @@ function GiftList() {
     // we received some patches
     setState(state => giftsReducer(state, { type: "APPLY_PATCHES", patches }))
   })
+
+  const handleUndo = () => {
+    if (!undoStack.current.length) return
+    const patches = undoStack.current.pop()
+    dispatch({ type: "APPLY_PATCHES", patches })
+  }
 
   const handleAdd = () => {
     const description = prompt("Gift to add")
@@ -84,6 +93,7 @@ function GiftList() {
         <button onClick={handleAdd}>Add</button>
         <button onClick={handleAddBook}>Add Book</button>
         <button onClick={handleReset}>Reset</button>
+        <button onClick={handleUndo}>Undo</button>
       </div>
       <div className="gifts">
         {Object.values(gifts).map(gift => (
