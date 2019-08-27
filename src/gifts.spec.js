@@ -1,4 +1,4 @@
-import { giftsReducer, getBookDetails } from "./gifts"
+import { giftsReducer, getBookDetails, patchGeneratingGiftsReducer } from "./gifts"
 
 const initialState = {
   users: [
@@ -70,6 +70,27 @@ describe("Reserving an unreserved gift", () => {
     expect(() => {
       nextState.gifts[1].reservedBy = undefined
     }).toThrow("read only")
+  })
+})
+
+describe("Reserving an unreserved gift with patches", () => {
+  const [nextState, patches] = patchGeneratingGiftsReducer(initialState, {
+    type: "TOGGLE_RESERVATION",
+    id: "egghead_subscription"
+  })
+
+  test("correctly stores reservedBy", () => {
+    expect(nextState.gifts[1].reservedBy).toBe(1) // Test user
+  })
+
+  test("generates the correct patches", () => {
+    expect(patches).toEqual([
+      {
+        op: "replace",
+        path: ["gifts", 1, "reservedBy"],
+        value: 1
+      }
+    ])
   })
 })
 
