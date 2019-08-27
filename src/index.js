@@ -7,6 +7,7 @@ import { getInitialState, getBookDetails, patchGeneratingGiftsReducer } from "./
 
 import "./misc/index.css"
 import { useSocket } from "./misc/useSocket"
+import { giftsReducer } from "./gifts"
 
 const Gift = memo(({ gift, users, currentUser, onReserve }) => (
   <div className={`gift ${gift.reservedBy ? "reserved" : ""}`}>
@@ -38,7 +39,7 @@ function GiftList() {
 
   const send = useSocket("ws://localhost:5001", function onMessage(patches) {
     // we received some patches
-    console.dir(patches)
+    setState(state => giftsReducer(state, { type: "APPLY_PATCHES", patches }))
   })
 
   const handleAdd = () => {
