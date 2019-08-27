@@ -8,15 +8,15 @@ export const giftsRecipe = (draft, action) => {
   switch (action.type) {
     case "ADD_GIFT":
       const { id, description, image } = action
-      draft.gifts.push({
+      draft.gifts[id] = {
         id,
         description,
         image,
         reservedBy: undefined
-      })
+      }
       break
     case "TOGGLE_RESERVATION":
-      const gift = draft.gifts.find(gift => gift.id === action.id)
+      const gift = draft.gifts[action.id]
       gift.reservedBy =
         gift.reservedBy === undefined
           ? draft.currentUser.id
@@ -26,12 +26,13 @@ export const giftsRecipe = (draft, action) => {
       break
     case "ADD_BOOK":
       const { book } = action
-      draft.gifts.push({
-        id: book.identifiers.isbn_10[0],
+      const isbn = book.identifiers.isbn_10[0]
+      draft.gifts[isbn] = {
+        id: isbn,
         description: book.title,
         image: book.cover.medium,
         reservedBy: undefined
-      })
+      }
       break
     case "RESET":
       return getInitialState()
