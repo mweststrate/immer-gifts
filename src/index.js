@@ -6,6 +6,7 @@ import uuidv4 from "uuid/v4"
 import { getInitialState, getBookDetails, patchGeneratingGiftsReducer } from "./gifts"
 
 import "./misc/index.css"
+import { useSocket } from "./misc/useSocket"
 
 const Gift = memo(({ gift, users, currentUser, onReserve }) => (
   <div className={`gift ${gift.reservedBy ? "reserved" : ""}`}>
@@ -30,10 +31,15 @@ function GiftList() {
   const dispatch = useCallback(action => {
     setState(currentState => {
       const [nextState, patches] = patchGeneratingGiftsReducer(currentState, action)
-      console.log(patches)
+      send(patches)
       return nextState
     })
   }, [])
+
+  const send = useSocket("ws://localhost:5001", function onMessage(patches) {
+    // we received some patches
+    console.dir(patches)
+  })
 
   const handleAdd = () => {
     const description = prompt("Gift to add")
