@@ -31,11 +31,11 @@ function GiftList() {
 
   const { users, gifts, currentUser } = state
 
-  const dispatch = useCallback(action => {
+  const dispatch = useCallback((action, undoable = true) => {
     setState(currentState => {
       const [nextState, patches, inversePatches] = patchGeneratingGiftsReducer(currentState, action)
-      send(patches)
-      undoStack.current.push(inversePatches)
+      send(patches) // always send patches
+      if (undoable) undoStack.current.push(inversePatches) // store patches if this is undoable
       return nextState
     })
   }, [])
@@ -48,7 +48,7 @@ function GiftList() {
   const handleUndo = () => {
     if (!undoStack.current.length) return
     const patches = undoStack.current.pop()
-    dispatch({ type: "APPLY_PATCHES", patches })
+    dispatch({ type: "APPLY_PATCHES", patches }, false)
   }
 
   const handleAdd = () => {
@@ -93,7 +93,9 @@ function GiftList() {
         <button onClick={handleAdd}>Add</button>
         <button onClick={handleAddBook}>Add Book</button>
         <button onClick={handleReset}>Reset</button>
-        <button onClick={handleUndo}>Undo</button>
+        <button onClick={handleUndo} disabled={!undoStack.current.length}>
+          Undo
+        </button>
       </div>
       <div className="gifts">
         {Object.values(gifts).map(gift => (
