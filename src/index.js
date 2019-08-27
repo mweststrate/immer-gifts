@@ -1,8 +1,9 @@
-import React, { useReducer, memo, useCallback } from "react"
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useState, memo, useCallback } from "react"
 import ReactDOM from "react-dom"
 import uuidv4 from "uuid/v4"
 
-import { getInitialState, getBookDetails, giftsReducer } from "./gifts"
+import { getInitialState, getBookDetails, patchGeneratingGiftsReducer } from "./gifts"
 
 import "./misc/index.css"
 
@@ -23,8 +24,16 @@ const Gift = memo(({ gift, users, currentUser, onReserve }) => (
 ))
 
 function GiftList() {
-  const [state, dispatch] = useReducer(giftsReducer, getInitialState())
+  const [state, setState] = useState(() => getInitialState())
   const { users, gifts, currentUser } = state
+
+  const dispatch = useCallback(action => {
+    setState(currentState => {
+      const [nextState, patches] = patchGeneratingGiftsReducer(currentState, action)
+      console.log(patches)
+      return nextState
+    })
+  }, [])
 
   const handleAdd = () => {
     const description = prompt("Gift to add")
