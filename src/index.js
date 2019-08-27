@@ -28,6 +28,7 @@ const Gift = memo(({ gift, users, currentUser, onReserve }) => (
 function GiftList() {
   const [state, setState] = useState(() => getInitialState())
   const undoStack = useRef([])
+  const undoStackPointer = useRef(-1)
 
   const { users, gifts, currentUser } = state
 
@@ -35,7 +36,11 @@ function GiftList() {
     setState(currentState => {
       const [nextState, patches, inversePatches] = patchGeneratingGiftsReducer(currentState, action)
       send(patches) // always send patches
-      if (undoable) undoStack.current.push(inversePatches) // store patches if this is undoable
+      if (undoable) {
+        const pointer = ++undoStackPointer.current
+        undoStack.current.length = pointer
+        undoStack.current[pointer] = { patches, inversePatches }
+      }
       return nextState
     })
   }, [])
@@ -46,9 +51,10 @@ function GiftList() {
   })
 
   const handleUndo = () => {
-    if (!undoStack.current.length) return
-    const patches = undoStack.current.pop()
+    if (undoStackPointer.current < 0) return
+    const patches = undoStack.current[undoStackPointer.current].inversePatches
     dispatch({ type: "APPLY_PATCHES", patches }, false)
+    undoStackPointer.current--
   }
 
   const handleAdd = () => {
@@ -93,7 +99,7 @@ function GiftList() {
         <button onClick={handleAdd}>Add</button>
         <button onClick={handleAddBook}>Add Book</button>
         <button onClick={handleReset}>Reset</button>
-        <button onClick={handleUndo} disabled={!undoStack.current.length}>
+        <button onClick={handleUndo} disabled={undoStackPointer.current < 0}>
           Undo
         </button>
       </div>
