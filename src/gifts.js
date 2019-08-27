@@ -27,7 +27,7 @@ export const giftsRecipe = (draft, action) => {
     case "ADD_BOOK":
       const { book } = action
       draft.gifts.push({
-        id: book.identifiers.isbn_10,
+        id: book.identifiers.isbn_10[0],
         description: book.title,
         image: book.cover.medium,
         reservedBy: undefined
