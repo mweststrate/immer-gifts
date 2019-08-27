@@ -57,6 +57,13 @@ function GiftList() {
     undoStackPointer.current--
   }
 
+  const handleRedo = () => {
+    if (undoStackPointer.current === undoStack.current.length - 1) return
+    undoStackPointer.current++
+    const patches = undoStack.current[undoStackPointer.current].patches
+    dispatch({ type: "APPLY_PATCHES", patches }, false)
+  }
+
   const handleAdd = () => {
     const description = prompt("Gift to add")
     if (description)
@@ -101,6 +108,9 @@ function GiftList() {
         <button onClick={handleReset}>Reset</button>
         <button onClick={handleUndo} disabled={undoStackPointer.current < 0}>
           Undo
+        </button>
+        <button onClick={handleRedo} disabled={undoStackPointer.current === undoStack.current.length - 1}>
+          Redo
         </button>
       </div>
       <div className="gifts">
