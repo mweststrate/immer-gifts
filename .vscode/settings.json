@@ -1,0 +1,13 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.minimap.enabled": false,
+  "explorer.confirmDragAndDrop": false,
+  "editor.fontSize": 18,
+  "terminal.integrated.fontSize": 18,
+  "workbench.activityBar.visible": false,
+  "editor.quickSuggestions": false,
+  "editor.suggestOnTriggerCharacters": false,
+  "editor.wordBasedSuggestions": false,
+  "editor.quickSuggestionsDelay": 1000000,
+  "editor.parameterHints.enabled": false
+}
