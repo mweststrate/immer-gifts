@@ -1,4 +1,5 @@
-import produce, { createDraft, finishDraft } from "immer"
+/* eslint-disable default-case */
+import produce from "immer"
 
 import { allUsers, getCurrentUser } from "./misc/users"
 import defaultGifts from "./misc/gifts"
