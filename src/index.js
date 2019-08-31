@@ -1,10 +1,12 @@
-import React, { useReducer, useCallback, memo } from "react"
+import React, { useState, useCallback, memo } from "react"
 import ReactDOM from "react-dom"
 import uuidv4 from "uuid/v4"
 
+import { useSocket } from "./misc/useSocket"
+
 import "./misc/index.css"
 
-import { getInitialState, addGift, toggleReservation, addBook, giftsReducer, getBookDetails } from "./gifts"
+import { getInitialState, giftsReducer, getBookDetails, patchGeneratingGiftsReducer } from "./gifts"
 
 const Gift = memo(function Gift({ gift, users, currentUser, onReserve }) {
   return (
@@ -27,8 +29,21 @@ const Gift = memo(function Gift({ gift, users, currentUser, onReserve }) {
 })
 
 function GiftList() {
-  const [state, dispatch] = useReducer(giftsReducer, getInitialState())
+  const [state, setState] = useState(() => getInitialState())
   const { users, gifts, currentUser } = state
+
+  const dispatch = useCallback(action => {
+    setState(currentState => {
+      const [nextState, patches] = patchGeneratingGiftsReducer(currentState, action)
+      send(patches)
+      return nextState
+    })
+  }, [])
+
+  const send = useSocket("ws://localhost:5001", function onMessage(patches) {
+    // we received some patches!
+    console.dir(patches)
+  })
 
   const handleAdd = () => {
     const description = prompt("Gift to add")

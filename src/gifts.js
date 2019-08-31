@@ -1,10 +1,10 @@
 /* eslint-disable default-case */
-import produce from "immer"
+import produce, { produceWithPatches } from "immer"
 
 import { allUsers, getCurrentUser } from "./misc/users"
 import defaultGifts from "./misc/gifts"
 
-export const giftsReducer = produce((draft, action) => {
+const giftsRecipe = (draft, action) => {
   switch (action.type) {
     case "ADD_GIFT":
       const { id, description, image } = action
@@ -37,7 +37,13 @@ export const giftsReducer = produce((draft, action) => {
     case "RESET":
       return getInitialState()
   }
-})
+}
+
+// (state, action) => state
+export const giftsReducer = produce(giftsRecipe)
+
+// (state, action) => [state, patches, inversePatches]
+export const patchGeneratingGiftsReducer = produceWithPatches(giftsRecipe)
 
 export function getInitialState() {
   return {
