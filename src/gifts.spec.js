@@ -1,6 +1,7 @@
-import { addGift, toggleReservation, addBook, getBookDetails, State } from "./gifts"
+import { addGift, toggleReservation, addBook, getBookDetails } from "./gifts"
+import { setAutoFreeze } from "immer"
 
-const initialState: State = {
+const initialState = {
   users: [
     {
       id: 1,
