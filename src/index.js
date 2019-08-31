@@ -4,7 +4,7 @@ import uuidv4 from "uuid/v4"
 
 import "./misc/index.css"
 
-import { getInitialState, addGift, toggleReservation } from "./gifts"
+import { getInitialState, addGift, toggleReservation, addBook } from "./gifts"
 
 const Gift = memo(function Gift({ gift, users, currentUser, onReserve }) {
   return (
@@ -47,6 +47,14 @@ function GiftList() {
     setState(getInitialState)
   }
 
+  const handleAddBook = async () => {
+    const isbn = prompt("Enter ISBN number", "0201558025")
+    if (isbn) {
+      const nextState = await addBook(state, isbn)
+      setState(nextState)
+    }
+  }
+
   return (
     <div className="app">
       <div className="header">
@@ -54,6 +62,7 @@ function GiftList() {
       </div>
       <div className="actions">
         <button onClick={handleAdd}>Add</button>
+        <button onClick={handleAddBook}>Add Book</button>
         <button onClick={handleReset}>Reset</button>
       </div>
       <div className="gifts">
