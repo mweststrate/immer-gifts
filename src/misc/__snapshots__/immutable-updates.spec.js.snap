@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`a library can store books 1`] = `
+Object {
+  "employees": Array [],
+  "floors": Object {
+    "2nd": Object {
+      "dept": Object {
+        "Computer Science": Object {
+          "shelves": Array [
+            Object {
+              "books": Array [
+                Object {
+                  "isbn-123-243": Object {
+                    "author": "Michel Westrate",
+                    "title": "Immer forever!",
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      },
+    },
+  },
+}
+`;
