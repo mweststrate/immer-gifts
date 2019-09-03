@@ -35,7 +35,8 @@ const giftsRecipe = (draft, action) => {
       })
       break
     case "RESET":
-      return getInitialState()
+      draft.gifts = getInitialState().gifts
+      break
     case "APPLY_PATCHES":
       return applyPatches(draft, action.patches)
   }

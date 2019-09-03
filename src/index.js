@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useCallback, memo } from "react"
 import ReactDOM from "react-dom"
 import uuidv4 from "uuid/v4"
