@@ -16,20 +16,20 @@ const initialState = {
     id: 1,
     name: "Test user"
   },
-  gifts: [
-    {
+  gifts: {
+    immer_license: {
       id: "immer_license",
       description: "Immer license",
       image: "https://raw.githubusercontent.com/immerjs/immer/master/images/immer-logo.png",
       reservedBy: 2
     },
-    {
+    egghead_subscription: {
       id: "egghead_subscription",
       description: "Egghead.io subscription",
       image: "https://pbs.twimg.com/profile_images/735242324293210112/H8YfgQHP_400x400.jpg",
       reservedBy: undefined
     }
-  ]
+  }
 }
 
 describe("Adding a gift", () => {
@@ -41,11 +41,11 @@ describe("Adding a gift", () => {
   })
 
   test("added a gift to the collection", () => {
-    expect(nextState.gifts.length).toBe(3)
+    expect(Object.keys(nextState.gifts).length).toBe(3)
   })
 
   test("didn't modify the original state", () => {
-    expect(initialState.gifts.length).toBe(2)
+    expect(Object.keys(initialState.gifts).length).toBe(2)
   })
 })
 
@@ -56,22 +56,22 @@ describe("Reserving an unreserved gift", () => {
   })
 
   test("correctly stores reservedBy", () => {
-    expect(nextState.gifts[1].reservedBy).toBe(1)
+    expect(nextState.gifts["egghead_subscription"].reservedBy).toBe(1)
   })
 
   test("didn't modify the original state", () => {
-    expect(initialState.gifts[1].reservedBy).toBe(undefined)
+    expect(initialState.gifts["egghead_subscription"].reservedBy).toBe(undefined)
   })
 
   test("does structurally share unchanged parts of the state tree", () => {
     expect(nextState).not.toBe(initialState)
-    expect(nextState.gifts[1]).not.toBe(initialState.gifts[1])
-    expect(nextState.gifts[0]).toBe(initialState.gifts[0])
+    expect(nextState.gifts["egghead_subscription"]).not.toBe(initialState.gifts["egghead_subscription"])
+    expect(nextState.gifts["immer_license"]).toBe(initialState.gifts["immer_license"])
   })
 
   test("can't accidentally modify the produced state", () => {
     expect(() => {
-      nextState.gifts[1].reservedBy = undefined
+      nextState.gifts["egghead_subscription"].reservedBy = undefined
     }).toThrowErrorMatchingInlineSnapshot(`"Cannot assign to read only property 'reservedBy' of object '#<Object>'"`)
   })
 })
@@ -83,14 +83,14 @@ describe("Reserving an unreserved gift with patches", () => {
   })
 
   test("correctly stores reservedBy", () => {
-    expect(nextState.gifts[1].reservedBy).toBe(1)
+    expect(nextState.gifts["egghead_subscription"].reservedBy).toBe(1)
   })
 
   test("generates the correct patches", () => {
     expect(patches).toEqual([
       {
         op: "replace",
-        path: ["gifts", 1, "reservedBy"],
+        path: ["gifts", "egghead_subscription", "reservedBy"],
         value: 1
       }
     ])
@@ -117,12 +117,12 @@ describe("Reserving an already reserved gift", () => {
   })
 
   test("preserves stored reservedBy", () => {
-    expect(nextState.gifts[0].reservedBy).toBe(2)
+    expect(nextState.gifts["immer_license"].reservedBy).toBe(2)
   })
 
   test("no new gift should be created", () => {
-    expect(nextState.gifts[0]).toEqual(initialState.gifts[0])
-    expect(nextState.gifts[0]).toBe(initialState.gifts[0])
+    expect(nextState.gifts["immer_license"]).toEqual(initialState.gifts["immer_license"])
+    expect(nextState.gifts["immer_license"]).toBe(initialState.gifts["immer_license"])
     expect(nextState).toBe(initialState)
   })
 })
@@ -134,7 +134,7 @@ describe("Can add book async", () => {
       type: "ADD_BOOK",
       book
     })
-    expect(nextState.gifts[2].description).toBe("Concrete mathematics")
+    expect(nextState.gifts["0201558025"].description).toBe("Concrete mathematics")
   })
 
   test("Can add two books in parallel", async () => {
@@ -149,6 +149,6 @@ describe("Can add book async", () => {
       book: await promise2
     }
     const nextState = [addBook1, addBook2].reduce(giftsReducer, initialState)
-    expect(nextState.gifts.length).toBe(4)
+    expect(Object.values(nextState.gifts).length).toBe(4)
   })
 })

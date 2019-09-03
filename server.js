@@ -1,5 +1,10 @@
 import { Server as WebSocketServer } from "ws"
 
+import gifts from "./src/misc/gifts.json"
+import { produceWithPatches, applyPatches } from "immer"
+
+const initialState = { gifts }
+
 const wss = new WebSocketServer({ port: 5001 })
 
 const connections = []
@@ -29,3 +34,15 @@ wss.on("connection", ws => {
   // send all the patches we received
   ws.send(JSON.stringify(history))
 })
+
+function compressHistory(currentPatches) {
+  const [, patches] = produceWithPatches(initialState, draft => {
+    return applyPatches(draft, currentPatches)
+  })
+  console.log(`compressed from ${currentPatches.length} to ${patches.length} patches`)
+  return patches
+}
+
+setInterval(() => {
+  history = compressHistory(history)
+}, 5000)
