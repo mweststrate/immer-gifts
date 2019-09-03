@@ -1,32 +1,27 @@
 import produce from "immer"
 
 function insertItem(array, index, item) {
-  return [...array.slice(0, index), item, ...array.slice(index)]
+  return produce(array, draft => {
+    draft.splice(index, 0, item)
+  })
 }
 
 function removeItem(array, index) {
-  return array.filter((item, localIndex) => localIndex !== index)
+  return produce(array, draft => {
+    draft.splice(index, 1)
+  })
 }
 
 function updateObjectInArray(array, index, item) {
-  return array.map((localItem, localIndex) => {
-    if (localIndex !== index) {
-      // This isn't the item we care about - keep it as-is
-      return localItem
-    }
-
-    // Otherwise, this is the one we want - return an updated value
-    return {
-      ...localItem,
-      ...item
-    }
+  return produce(array, draft => {
+    draft[index] = { ...draft[index], ...item }
   })
 }
 
 function removeItemFromObject(object, key) {
-  const copy = { ...object }
-  delete copy[key]
-  return copy
+  return produce(object, draft => {
+    delete draft[key]
+  })
 }
 
 describe("Simple updates work", () => {
@@ -80,29 +75,9 @@ describe("Simple updates work", () => {
 
 describe("a library", () => {
   function storeBook(state, action) {
-    return {
-      ...state,
-      floors: {
-        ...state.floors,
-        [action.floor]: {
-          ...state.floors[action.floor],
-          dept: {
-            ...state.floors[action.floor].dept,
-            [action.dept]: {
-              ...state.floors[action.floor].dept[action.dept],
-              shelves: state.floors[action.floor].dept[action.dept].shelves.map((shelve, index) => {
-                return index !== action.shelve
-                  ? shelve
-                  : {
-                      ...shelve,
-                      books: [...shelve.books, action.book]
-                    }
-              })
-            }
-          }
-        }
-      }
-    }
+    return produce(state, draft => {
+      draft.floors[action.floor].dept[action.dept].shelves[action.shelve].books.push(action.book)
+    })
   }
 
   const library = {
