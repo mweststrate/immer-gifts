@@ -42,7 +42,7 @@ function GiftList() {
 
   const send = useSocket("ws://localhost:5001", function onMessage(patches) {
     // we received some patches!
-    console.dir(patches)
+    setState(state => giftsReducer(state, { type: "APPLY_PATCHES", patches }))
   })
 
   const handleAdd = () => {
