@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useCallback, memo } from "react"
+import React, { useState, useCallback, memo, useRef } from "react"
 import ReactDOM from "react-dom"
 import uuidv4 from "uuid/v4"
 
@@ -31,12 +31,20 @@ const Gift = memo(function Gift({ gift, users, currentUser, onReserve }) {
 
 function GiftList() {
   const [state, setState] = useState(() => getInitialState())
+  const undoStack = useRef([])
+  const undoStackPointer = useRef(-1)
+
   const { users, gifts, currentUser } = state
 
-  const dispatch = useCallback(action => {
+  const dispatch = useCallback((action, undoable = true) => {
     setState(currentState => {
-      const [nextState, patches] = patchGeneratingGiftsReducer(currentState, action)
+      const [nextState, patches, inversePatches] = patchGeneratingGiftsReducer(currentState, action)
       send(patches)
+      if (undoable) {
+        const pointer = ++undoStackPointer.current
+        undoStack.current.length = pointer
+        undoStack.current[pointer] = { patches, inversePatches }
+      }
       return nextState
     })
   }, [])
@@ -82,6 +90,20 @@ function GiftList() {
     }
   }
 
+  const handleUndo = () => {
+    if (!undoStackPointer.current < 0) return
+    const patches = undoStack.current[undoStackPointer.current].inversePatches
+    undoStackPointer.current--
+    dispatch({ type: "APPLY_PATCHES", patches }, false)
+  }
+
+  const handleRedo = () => {
+    if (undoStackPointer.current === undoStack.current.length - 1) return
+    undoStackPointer.current++
+    const patches = undoStack.current[undoStackPointer.current].patches
+    dispatch({ type: "APPLY_PATCHES", patches }, false)
+  }
+
   return (
     <div className="app">
       <div className="header">
@@ -91,6 +113,12 @@ function GiftList() {
         <button onClick={handleAdd}>Add</button>
         <button onClick={handleAddBook}>Add Book</button>
         <button onClick={handleReset}>Reset</button>
+        <button onClick={handleUndo} disabled={undoStackPointer.current < 0}>
+          Undo
+        </button>
+        <button onClick={handleRedo} disabled={undoStackPointer.current === undoStack.current.length - 1}>
+          Redo
+        </button>
       </div>
       <div className="gifts">
         {Object.values(gifts).map(gift => (
