@@ -40,7 +40,7 @@
     "@types/react-dom": "^16.9.0",
     "deepfreeze": "^2.0.0",
     "esm": "^3.2.25",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "prettier": "^1.18.2",
     "typescript": "^3.5.3"
   }
