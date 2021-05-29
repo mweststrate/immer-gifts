@@ -10,7 +10,7 @@
     "react-scripts": "3.0.1",
     "use-immer": "^0.3.3",
     "uuid": "^3.3.3",
-    "ws": "^7.1.0"
+    "ws": "^7.4.6"
   },
   "scripts": {
     "start": "react-scripts start",
